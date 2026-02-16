@@ -127,7 +127,7 @@ public class TeamSteps {
 		assertTrue(lastException.getMessage().contains(expectedMessage)
 				|| (lastException.getCause() != null
 						&& lastException.getCause().getMessage().contains(expectedMessage)),
-				"Error rebut incorrecte: " + lastException.getMessage());
+				"Unexpected error message: " + lastException.getMessage());
 	}
 
 	@Given("I have a team {string} with a member {string}")
