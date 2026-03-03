@@ -28,19 +28,16 @@ public class Match extends UriEntity<Long> {
 	@EqualsAndHashCode.Include
 	private Long id;
 
-	@EqualsAndHashCode.Include
 	private LocalTime startTime;
 	private LocalTime endTime;
 
-	@EqualsAndHashCode.Include
-	@JsonBackReference("round-matches")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "round_id")
+	@JsonBackReference("round-matches")
 	private Round round;
 
-	@EqualsAndHashCode.Include
-	@JsonBackReference("table-matches")
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "table_id")
+	@JsonBackReference("table-matches")
 	private CompetitionTable competitionTable;
 }

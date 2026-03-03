@@ -26,7 +26,7 @@ public class CompetitionTable extends UriEntity<String> {
 	@EqualsAndHashCode.Include
 	private String id;
 
-	@OneToMany(mappedBy = "competitionTable", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "competitionTable", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JsonManagedReference("table-matches")
 	@Setter(lombok.AccessLevel.NONE)
 	private List<Match> matches = new ArrayList<>();
