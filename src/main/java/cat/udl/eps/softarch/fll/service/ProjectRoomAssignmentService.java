@@ -29,8 +29,8 @@ public class ProjectRoomAssignmentService {
 		Judge judge = judgeRepository.findById(Long.valueOf(request.judgeId()))
 				.orElseThrow(() -> new RoomAssignmentException("JUDGE_NOT_FOUND", "Judge not found"));
 
-		boolean isAlreadyManager = room.getManagedByJudge() != null &&
-				room.getManagedByJudge().getId().equals(judge.getId());
+		boolean isAlreadyManager = room.getManagedByJudge() != null
+				&& room.getManagedByJudge().getId().equals(judge.getId());
 
 		boolean isAlreadyPanelist = room.getPanelists().stream()
 				.anyMatch(p -> p.getId().equals(judge.getId()));

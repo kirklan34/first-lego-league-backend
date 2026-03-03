@@ -72,8 +72,6 @@ public class ProjectRoomSteps {
 			panelist.setEmailAddress("p" + UUID.randomUUID().toString().substring(0, 4) + "@test.com");
 			panelist.setPhoneNumber("111");
 
-			// EL TRUC ESTÀ AQUÍ: Assignem la sala al jutge en lloc d'afegir el jutge a la llista de la sala
-			// Això evita completament el LazyInitializationException
 			panelist.setMemberOfRoom(room);
 			judgeRepository.save(panelist);
 		}
@@ -85,7 +83,6 @@ public class ProjectRoomSteps {
 		Long realId = judgeIdMap.get(judgeAlias);
 		Judge judge = judgeRepository.findById(realId).orElseThrow();
 
-		// EL MATEIX TRUC AQUÍ
 		judge.setMemberOfRoom(room);
 		judgeRepository.save(judge);
 	}
