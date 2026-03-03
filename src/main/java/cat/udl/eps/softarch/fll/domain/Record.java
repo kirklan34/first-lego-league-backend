@@ -10,7 +10,6 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.ZonedDateTime;
 
 @Entity
