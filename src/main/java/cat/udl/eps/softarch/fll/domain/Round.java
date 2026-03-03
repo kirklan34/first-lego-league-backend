@@ -45,14 +45,22 @@ public class Round extends UriEntity<Long> {
 	}
 
 	public void addMatch(Match match) {
-		if (match != null && !matches.contains(match)) {
-			matches.add(match);
-			match.setRound(this);
+		if (match == null || matches.contains(match)) {
+			return;
 		}
+
+		Round previousRound = match.getRound();
+		if (previousRound != null && previousRound != this) {
+			previousRound.getMatches().remove(match);
+		}
+
+		matches.add(match);
+		match.setRound(this);
 	}
 
 	public void removeMatch(Match match) {
-		matches.remove(match);
-		match.setRound(null);
+		if (match != null && matches.remove(match)) {
+			match.setRound(null);
+		}
 	}
 }

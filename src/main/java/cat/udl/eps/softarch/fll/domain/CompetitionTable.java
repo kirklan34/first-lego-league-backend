@@ -45,13 +45,24 @@ public class CompetitionTable extends UriEntity<String> {
 	}
 
 	public void addMatch(Match match) {
-		if (match != null && !matches.contains(match)) {
-			matches.add(match);
-			match.setCompetitionTable(this);
+		if (match == null || matches.contains(match)) {
+			return;
 		}
+
+		CompetitionTable previousTable = match.getCompetitionTable();
+		if (previousTable != null && previousTable != this) {
+			previousTable.getMatches().remove(match);
+		}
+
+		matches.add(match);
+		match.setCompetitionTable(this);
 	}
 
 	public void removeMatch(Match match) {
+		if (match == null) {
+			return;
+		}
+
 		if (matches.remove(match)) {
 			match.setCompetitionTable(null);
 		}
@@ -68,14 +79,25 @@ public class CompetitionTable extends UriEntity<String> {
 		if (referee == null || referees.contains(referee)) {
 			return;
 		}
+
 		if (referees.size() >= 3) {
 			throw new IllegalStateException("A table can have a maximum of 3 referees");
 		}
+
+		CompetitionTable previousTable = referee.getSupervisesTable();
+		if (previousTable != null && previousTable != this) {
+			previousTable.getReferees().remove(referee);
+		}
+
 		referees.add(referee);
 		referee.setSupervisesTable(this);
 	}
 
 	public void removeReferee(Referee referee) {
+		if (referee == null) {
+			return;
+		}
+
 		if (referees.remove(referee)) {
 			referee.setSupervisesTable(null);
 		}
