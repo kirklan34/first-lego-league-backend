@@ -75,8 +75,8 @@ public class Team extends UriEntity<String> {
 	private Set<Floater> floaters = new HashSet<>();
 
 	public static Team create(String name, String city, Integer foundationYear, String category) {
-		DomainValidation.requireNonBlank(name, "name");
-		DomainValidation.requireNonBlank(city, "city");
+		DomainValidation.requireLengthBetween(name, 3, 50, "name");
+		DomainValidation.requireLengthBetween(city, 1, 100, "city");
 		DomainValidation.requireMin(foundationYear, 1998, "foundationYear");
 		DomainValidation.requireNonBlank(category, "category");
 
@@ -85,6 +85,7 @@ public class Team extends UriEntity<String> {
 		team.city = city;
 		team.foundationYear = foundationYear;
 		team.category = category;
+		team.inscriptionDate = LocalDate.now();
 		return team;
 	}
 

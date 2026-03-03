@@ -46,7 +46,7 @@ public class User extends UriEntity<String> implements UserDetails {
 		User user = new User();
 		user.id = id;
 		user.email = email;
-		user.password = password;
+		user.password = passwordEncoder.encode(password);
 		return user;
 	}
 
