@@ -26,21 +26,27 @@ public class TeamCoachController {
 		);
 	}
 
-	@ExceptionHandler(NoSuchElementException.class)
-	public ResponseEntity<Map<String, String>> handleNotFound(NoSuchElementException ex) {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	@ExceptionHandler({NoSuchElementException.class, IllegalArgumentException.class})
+	public ResponseEntity<Map<String, String>> handleBadRequest(RuntimeException ex) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 			.body(Map.of("error", ex.getMessage()));
 	}
 
 	@ExceptionHandler(IllegalStateException.class)
 	public ResponseEntity<Map<String, String>> handleConflict(IllegalStateException ex) {
-		return ResponseEntity.status(HttpStatus.CONFLICT)
-			.body(Map.of("error", ex.getMessage()));
+		String msg = ex.getMessage();
+		if ("COACH_ALREADY_ASSIGNED".equals(msg)
+			|| "MAX_COACHES_PER_TEAM_REACHED".equals(msg)
+			|| "MAX_TEAMS_PER_COACH_REACHED".equals(msg)) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(Map.of("error", msg));
+		}
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+			.body(Map.of("error", msg));
 	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Map<String, String>> handleUnexpected(Exception ex) {
-		ex.printStackTrace(); // opcional: log real del error
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 			.body(Map.of("error", "INTERNAL_SERVER_ERROR"));
 	}
