@@ -10,6 +10,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.ResultActions;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.And;
@@ -25,8 +26,7 @@ public class ManageScientificProjectStepDefs {
 		this.stepDefs = stepDefs;
 	}
 
-	private ResultActions performCreateProject(Integer score, String comments, String teamUri, boolean includeTeam)
-			throws Exception {
+	private ResultActions performCreateProject(Integer score, String comments, String teamUri, boolean includeTeam) throws Exception {
 		JSONObject payload = new JSONObject();
 		payload.put("score", score);
 		payload.put("comments", comments);
@@ -50,7 +50,7 @@ public class ManageScientificProjectStepDefs {
 		teamJson.put("foundationYear", 2005);
 		teamJson.put("category", "Challenge");
 
-		var response = stepDefs.mockMvc.perform(
+		MockHttpServletResponse response = stepDefs.mockMvc.perform(
 				post("/teams")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(teamJson.toString())
@@ -70,6 +70,7 @@ public class ManageScientificProjectStepDefs {
 
 	@When("I create a new scientific project with score {int} and comments {string} for team {string}")
 	public void iCreateScientificProjectForTeam(Integer score, String comments, String teamName) throws Exception {
+		latestScientificProjectUri = null;
 		String teamUri = ensureTeamExists(teamName);
 		stepDefs.result = performCreateProject(score, comments, teamUri, true);
 		if (stepDefs.result.andReturn().getResponse().getStatus() == 201) {
@@ -79,13 +80,21 @@ public class ManageScientificProjectStepDefs {
 
 	@When("I create a new scientific project with score {int} and comments {string} without team")
 	public void iCreateScientificProjectWithoutTeam(Integer score, String comments) throws Exception {
+		latestScientificProjectUri = null;
 		stepDefs.result = performCreateProject(score, comments, null, false);
+		if (stepDefs.result.andReturn().getResponse().getStatus() == 201) {
+			latestScientificProjectUri = stepDefs.result.andReturn().getResponse().getHeader("Location");
+		}
 	}
 
 	@When("I create a new scientific project with score {int} and comments {string} and invalid team")
 	public void iCreateScientificProjectWithInvalidTeam(Integer score, String comments) throws Exception {
-		String invalidTeamUri = "NonExistingTeam";
+		latestScientificProjectUri = null;
+		String invalidTeamUri = "http://localhost/teams/NonExistingTeam";
 		stepDefs.result = performCreateProject(score, comments, invalidTeamUri, true);
+		if (stepDefs.result.andReturn().getResponse().getStatus() == 201) {
+			latestScientificProjectUri = stepDefs.result.andReturn().getResponse().getHeader("Location");
+		}
 	}
 
 	@Given("There is a scientific project with score {int} and comments {string} for team {string}")
@@ -116,6 +125,9 @@ public class ManageScientificProjectStepDefs {
 
 	@When("I request the team of the latest scientific project")
 	public void iRequestTheTeamOfTheLatestScientificProject() throws Exception {
+		if (latestScientificProjectUri == null) {
+			throw new IllegalStateException("No scientific project URI is available in the current scenario.");
+		}
 		String path = URI.create(latestScientificProjectUri).getPath() + "/team";
 		stepDefs.result = stepDefs.mockMvc.perform(
 				get(path)
