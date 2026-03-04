@@ -100,16 +100,12 @@ public class AssignCoachStepDefs {
 
 	@Then("the error {word} is returned")
 	public void errorReturned(String error) throws Exception {
-		int expectedStatus;
-		switch (error) {
-			case "COACH_ALREADY_ASSIGNED":
-			case "MAX_COACHES_PER_TEAM_REACHED":
-			case "MAX_TEAMS_PER_COACH_REACHED":
-				expectedStatus = 409;
-				break;
-			default:
-				expectedStatus = 400;
-		}
+		int expectedStatus = switch (error) {
+			case "COACH_ALREADY_ASSIGNED",
+				"MAX_COACHES_PER_TEAM_REACHED",
+				"MAX_TEAMS_PER_COACH_REACHED" -> 409;
+			default -> 400;
+		};
 
 		stepDefs.result.andExpect(status().is(expectedStatus))
 			.andExpect(jsonPath("$.error").value(error));

@@ -8,7 +8,6 @@ import cat.udl.eps.softarch.fll.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
