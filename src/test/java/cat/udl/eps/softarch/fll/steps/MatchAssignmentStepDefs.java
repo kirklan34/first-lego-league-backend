@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
@@ -27,6 +28,8 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 public class MatchAssignmentStepDefs {
+	private static final Long NON_EXISTENT_MATCH_ID = Long.MAX_VALUE;
+	private static final AtomicInteger ROUND_NUMBER_SEQUENCE = new AtomicInteger(1);
 
 	private final StepDefs stepDefs;
 	private final MatchRepository matchRepository;
@@ -194,7 +197,7 @@ public class MatchAssignmentStepDefs {
 
 	@When("I assign referees in batch for round id {string}")
 	public void assignRefereesInBatchForRoundId(String roundId) throws Exception {
-		assignBatchForRound(roundId, List.of(new BatchAssignment(10L, currentReferee.getId())));
+		assignBatchForRound(roundId, List.of(new BatchAssignment(NON_EXISTENT_MATCH_ID, currentReferee.getId())));
 	}
 
 	@Then("assignment response status is {string}")
@@ -254,7 +257,7 @@ public class MatchAssignmentStepDefs {
 
 	private Round createRound() {
 		Round round = new Round();
-		round.setNumber((int) (System.nanoTime() % 1_000_000));
+		round.setNumber(ROUND_NUMBER_SEQUENCE.getAndIncrement());
 		return roundRepository.save(round);
 	}
 
