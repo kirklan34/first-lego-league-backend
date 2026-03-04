@@ -146,7 +146,7 @@ public class EditionVolunteerStepDefs {
 
 	private Edition createEdition(String venueName, String description) {
 		Edition edition = new Edition();
-		edition.setYear(2000 + Math.abs(UUID.randomUUID().hashCode() % 1000));
+		edition.setYear(2026);
 		edition.setVenueName(venueName + " " + UUID.randomUUID());
 		edition.setDescription(description);
 		return editionRepository.save(edition);

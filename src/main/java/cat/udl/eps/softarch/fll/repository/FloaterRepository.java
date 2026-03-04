@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 import cat.udl.eps.softarch.fll.domain.Floater;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,5 +25,6 @@ public interface FloaterRepository extends CrudRepository<Floater, Long>, Paging
 			description = "Returns a list of Floaters whose names contain the specified text.")
 	List<Floater> findByNameContainingIgnoreCase(@Param("text") String text);
 
+	@RestResource(exported = false)
 	List<Floater> findByEditionId(Long editionId);
 }

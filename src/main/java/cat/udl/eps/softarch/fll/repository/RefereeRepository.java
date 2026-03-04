@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.stereotype.Repository;
 import cat.udl.eps.softarch.fll.domain.Referee;
 
@@ -13,6 +14,7 @@ public interface RefereeRepository extends CrudRepository<Referee, Long>, Paging
 
 	List<Referee> findAll();
 
+	@RestResource(exported = false)
 	List<Referee> findByEditionId(Long editionId);
 
 }

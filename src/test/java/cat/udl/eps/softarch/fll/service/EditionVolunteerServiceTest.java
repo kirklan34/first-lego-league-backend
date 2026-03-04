@@ -71,14 +71,19 @@ class EditionVolunteerServiceTest {
 		assertEquals(1L, response.referees().get(0).id());
 		assertEquals("Ref One", response.referees().get(0).name());
 		assertEquals("ref1@example.com", response.referees().get(0).emailAddress());
+		assertEquals("111111111", response.referees().get(0).phoneNumber());
 
 		assertEquals(1, response.judges().size());
 		assertEquals(2L, response.judges().get(0).id());
 		assertEquals("Judge One", response.judges().get(0).name());
+		assertEquals("judge1@example.com", response.judges().get(0).emailAddress());
+		assertEquals("222222222", response.judges().get(0).phoneNumber());
 
 		assertEquals(1, response.floaters().size());
 		assertEquals(3L, response.floaters().get(0).id());
 		assertEquals("Floater One", response.floaters().get(0).name());
+		assertEquals("floater1@example.com", response.floaters().get(0).emailAddress());
+		assertEquals("333333333", response.floaters().get(0).phoneNumber());
 		verify(refereeRepository).findByEditionId(10L);
 		verify(judgeRepository).findByEditionId(10L);
 		verify(floaterRepository).findByEditionId(10L);
