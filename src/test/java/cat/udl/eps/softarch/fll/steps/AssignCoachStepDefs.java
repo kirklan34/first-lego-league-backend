@@ -28,8 +28,8 @@ public class AssignCoachStepDefs {
 	private CoachRepository coachRepository;
 	private ObjectMapper mapper;
 
-	// Mapa para guardar teamName -> teamId (como String)
 	private Map<String, String> teamIdMap = new HashMap<>();
+	private Map<Integer, Integer> coachIdMap = new HashMap<>();
 
 	public AssignCoachStepDefs(StepDefs stepDefs,
 							   TeamRepository teamRepository,
@@ -38,6 +38,7 @@ public class AssignCoachStepDefs {
 		this.teamRepository = teamRepository;
 		this.coachRepository = coachRepository;
 		this.mapper = new ObjectMapper();
+
 	}
 
 	@Before
@@ -65,7 +66,7 @@ public class AssignCoachStepDefs {
 		team.setCategory("FLL");
 		team.setEducationalCenter("School");
 		teamRepository.save(team);
-		teamIdMap.put(teamName, team.getId()); // Guardamos el ID como String
+		teamIdMap.put(teamName, team.getId());
 	}
 
 	@Given("a coach with id {int} exists")
@@ -75,6 +76,7 @@ public class AssignCoachStepDefs {
 		coach.setEmailAddress("coach" + id + "@mail.com");
 		coach.setPhoneNumber("123456789");
 		coachRepository.save(coach);
+		coachIdMap.put(id, coach.getId());
 	}
 
 	@Given("coach {int} is assigned to team {string}")
@@ -86,7 +88,8 @@ public class AssignCoachStepDefs {
 	@When("I assign coach {int} to team {string}")
 	public void assignCoach(Integer coachId, String teamName) throws Exception {
 		String teamId = teamIdMap.get(teamName);
-		stepDefs.result = performAssignCoach(teamId, coachId);
+		Integer persistedCoachId = coachIdMap.getOrDefault(coachId, coachId);
+		stepDefs.result = performAssignCoach(teamId, persistedCoachId);
 	}
 
 	@Then("the assignment is successful")
@@ -97,7 +100,17 @@ public class AssignCoachStepDefs {
 
 	@Then("the error {word} is returned")
 	public void errorReturned(String error) throws Exception {
-		int expectedStatus = "COACH_ALREADY_ASSIGNED".equals(error) ? 409 : 400;
+		int expectedStatus;
+		switch (error) {
+			case "COACH_ALREADY_ASSIGNED":
+			case "MAX_COACHES_PER_TEAM_REACHED":
+			case "MAX_TEAMS_PER_COACH_REACHED":
+				expectedStatus = 409;
+				break;
+			default:
+				expectedStatus = 400;
+		}
+
 		stepDefs.result.andExpect(status().is(expectedStatus))
 			.andExpect(jsonPath("$.error").value(error));
 	}

@@ -16,6 +16,8 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class TeamCoachController {
 
+	private static final String ERROR_KEY = "error";
+
 	private final CoachService teamCoachService;
 
 	@PostMapping("/assign-coach")
@@ -29,7 +31,7 @@ public class TeamCoachController {
 	@ExceptionHandler({NoSuchElementException.class, IllegalArgumentException.class})
 	public ResponseEntity<Map<String, String>> handleBadRequest(RuntimeException ex) {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-			.body(Map.of("error", ex.getMessage()));
+			.body(Map.of(ERROR_KEY, ex.getMessage()));
 	}
 
 	@ExceptionHandler(IllegalStateException.class)
@@ -39,15 +41,15 @@ public class TeamCoachController {
 			|| "MAX_COACHES_PER_TEAM_REACHED".equals(msg)
 			|| "MAX_TEAMS_PER_COACH_REACHED".equals(msg)) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
-				.body(Map.of("error", msg));
+				.body(Map.of(ERROR_KEY, msg));
 		}
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-			.body(Map.of("error", msg));
+			.body(Map.of(ERROR_KEY, msg));
 	}
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Map<String, String>> handleUnexpected(Exception ex) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-			.body(Map.of("error", "INTERNAL_SERVER_ERROR"));
+			.body(Map.of(ERROR_KEY, "INTERNAL_SERVER_ERROR"));
 	}
 }
