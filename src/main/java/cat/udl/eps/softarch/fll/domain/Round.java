@@ -9,6 +9,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
@@ -31,6 +33,10 @@ public class Round extends UriEntity<Long> {
 
 	@Column(unique = true)
 	private int number;
+
+	@ManyToOne
+	@JoinColumn(name = "edition_id")
+	private Edition edition;
 
 	@OneToMany(mappedBy = "round", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference("round-matches")
