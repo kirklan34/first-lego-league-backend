@@ -106,6 +106,49 @@ class MatchTableAssignmentServiceTest {
 		assertSame(newTable, match.getCompetitionTable());
 	}
 
+	@Test
+	void assignTableFailsWhenMatchMissingStartTime() {
+		Match match = new Match();
+		match.setId(10L);
+		match.setEndTime(LocalTime.parse("11:20"));
+		CompetitionTable table = buildTable("Table-1");
+		when(matchRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(match));
+		when(competitionTableRepository.findByIdForUpdate("Table-1")).thenReturn(Optional.of(table));
+
+		ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> service.assignTable(10L, "Table-1"));
+
+		assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, ex.getStatusCode());
+		assertEquals("Match is missing start time", ex.getReason());
+	}
+
+	@Test
+	void assignTableFailsWhenMatchMissingEndTime() {
+		Match match = new Match();
+		match.setId(10L);
+		match.setStartTime(LocalTime.parse("11:00"));
+		CompetitionTable table = buildTable("Table-1");
+		when(matchRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(match));
+		when(competitionTableRepository.findByIdForUpdate("Table-1")).thenReturn(Optional.of(table));
+
+		ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> service.assignTable(10L, "Table-1"));
+
+		assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, ex.getStatusCode());
+		assertEquals("Match is missing end time", ex.getReason());
+	}
+
+	@Test
+	void assignTableFailsWhenMatchEndTimeIsNotAfterStartTime() {
+		Match match = buildMatch(10L, null, "11:20", "11:00");
+		CompetitionTable table = buildTable("Table-1");
+		when(matchRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(match));
+		when(competitionTableRepository.findByIdForUpdate("Table-1")).thenReturn(Optional.of(table));
+
+		ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> service.assignTable(10L, "Table-1"));
+
+		assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, ex.getStatusCode());
+		assertEquals("Match end time must be after start time", ex.getReason());
+	}
+
 	private Match buildMatch(Long id, String tableId, String startTime, String endTime) {
 		Match match = new Match();
 		match.setId(id);

@@ -39,3 +39,9 @@ Feature: Match table assignment
 		When I assign that match to table identifier "Table-2"
 		Then The response code is 200
 		And the assigned table identifier is "Table-2"
+
+	Scenario: Invalid match schedule
+		Given a scheduled match without table exists from "11:20" to "11:00"
+		And a competition table with identifier "Table-1" exists
+		When I assign that match to table identifier "Table-1"
+		Then The response code is 422
