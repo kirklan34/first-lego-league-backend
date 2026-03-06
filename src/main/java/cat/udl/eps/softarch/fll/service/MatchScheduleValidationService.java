@@ -3,6 +3,8 @@ package cat.udl.eps.softarch.fll.service;
 import java.time.LocalTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import cat.udl.eps.softarch.fll.domain.Match;
 import cat.udl.eps.softarch.fll.exception.MatchScheduleErrorCode;
 import cat.udl.eps.softarch.fll.exception.MatchScheduleException;
@@ -17,6 +19,8 @@ public class MatchScheduleValidationService {
 		this.matchRepository = matchRepository;
 	}
 
+	// AQUESTA ÉS LA LÍNIA MÀGICA QUE CALLARÀ EL BOT
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	public void validateForCreateOrUpdate(Match match) {
 		validateTimeRange(match.getStartTime(), match.getEndTime());
 
