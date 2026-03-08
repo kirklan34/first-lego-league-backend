@@ -28,14 +28,15 @@ public class MatchSearchService {
 
 		validateTimeRange(startFrom, endTo);
 
-		if (pageable.getSort().isUnsorted()) {
-			pageable = PageRequest.of(
-				pageable.getPageNumber(),
-				pageable.getPageSize(),
-				Sort.by("startTime").ascending()
-					.and(Sort.by("id").ascending())
-			);
+		Sort sort = pageable.getSort().isSorted() ? pageable.getSort() : Sort.by("startTime").ascending();
+		if (sort.getOrderFor("id") == null) {
+			sort = sort.and(Sort.by("id").ascending());
 		}
+		pageable = PageRequest.of(
+			pageable.getPageNumber(),
+			pageable.getPageSize(),
+			sort
+		);
 
 		Specification<Match> spec =
 			Specification.where(MatchSpecifications.timeOverlap(startFrom, endTo))
@@ -54,14 +55,19 @@ public class MatchSearchService {
 	}
 
 	private MatchSearchItemResponse toDto(Match match) {
-		MatchSearchItemResponse dto = new MatchSearchItemResponse();
+		if (match.getCompetitionTable() == null) {
+			throw new IllegalStateException("Match " + match.getId() + " has no competition table");
+		}
+		if (match.getRound() == null) {
+			throw new IllegalStateException("Match " + match.getId() + " has no round");
+		}
 
+		MatchSearchItemResponse dto = new MatchSearchItemResponse();
 		dto.setMatchId(match.getId().toString());
 		dto.setStartTime(match.getStartTime());
 		dto.setEndTime(match.getEndTime());
-		dto.setTableId(match.getCompetitionTable() != null ? match.getCompetitionTable().getId() : null);
-		dto.setRoundId(match.getRound() != null ? match.getRound().getId() : null);
-
+		dto.setTableId(match.getCompetitionTable().getId());
+		dto.setRoundId(match.getRound().getId());
 		return dto;
 	}
 }

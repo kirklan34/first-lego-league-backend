@@ -75,6 +75,10 @@ public class MatchSearchStepDefs {
 	public void iSearchMatchesWithNoFilters() throws Exception {
 		stepDefs.result = stepDefs.mockMvc.perform(
 			get("/matches/filter")
+				.param("page", "0")
+				.param("size", "2")
+				.param("sort", "startTime,asc")
+				.param("sort", "id,asc")
 				.with(user("admin"))
 				.contentType(MediaType.APPLICATION_JSON)
 		);
@@ -114,17 +118,21 @@ public class MatchSearchStepDefs {
 		);
 	}
 
+
+
 	@Then("the match response status should be {int}")
 	public void theResponseStatusShouldBe(Integer statusCode) throws Exception {
 		stepDefs.result.andExpect(status().is(statusCode));
 	}
 
 	@Then("the response should contain matches")
-	public void the_response_should_contain_matches() throws Exception {
-		stepDefs.result.andExpect(jsonPath("$.page").exists());
-		stepDefs.result.andExpect(jsonPath("$.size").exists());
-		stepDefs.result.andExpect(jsonPath("$.totalElements").exists());
-		stepDefs.result.andExpect(jsonPath("$.items").isArray());
+	public void theResponseShouldContainMatchesInOrder() throws Exception {
+		stepDefs.result
+			.andExpect(jsonPath("$.items[0].startTime").value("10:00:00"))
+			.andExpect(jsonPath("$.items[1].startTime").value("11:15:00"))
+			.andExpect(jsonPath("$.page").value(0))
+			.andExpect(jsonPath("$.size").value(2))
+			.andExpect(jsonPath("$.totalElements").value(2));
 	}
 
 	@Then("the error code should be \"INVALID_TIME_FILTER_RANGE\"")

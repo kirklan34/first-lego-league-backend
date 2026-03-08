@@ -52,7 +52,7 @@ public class MatchSearchController {
 					"errorCode", ex.getMessage(),
 					"message", "Start time must not be after end time",
 					"timestamp", java.time.Instant.now().toString(),
-					"path", "/matches/search"
+					"path", "/matches/filter"
 				));
 		}
 	}
