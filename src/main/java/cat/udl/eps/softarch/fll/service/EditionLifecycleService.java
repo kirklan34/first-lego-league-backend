@@ -36,14 +36,15 @@ public class EditionLifecycleService {
 	}
 
 	public void assertOperationAllowed(Edition edition, EditionOperation operation) {
+		EditionState currentState = edition.getState() == null ? EditionState.DRAFT : edition.getState();
 		boolean allowed = switch (operation) {
-			case TEAM_REGISTRATION -> edition.getState() == EditionState.OPEN;
+			case TEAM_REGISTRATION -> currentState == EditionState.OPEN;
 		};
 
 		if (!allowed) {
 			throw new EditionLifecycleException(
 					"EDITION_OPERATION_NOT_ALLOWED",
-					"Operation " + operation + " is not allowed when edition is in state " + edition.getState());
+					"Operation " + operation + " is not allowed when edition is in state " + currentState);
 		}
 	}
 

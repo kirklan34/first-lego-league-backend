@@ -70,11 +70,15 @@ public class EditionLifecycleController {
 	}
 
 	private boolean isInvalidStateValueError(Throwable cause) {
-		String className = cause.getClass().getSimpleName();
-		String message = cause.getMessage();
-		return "InvalidFormatException".equals(className)
-				&& message != null
-				&& message.contains("EditionState");
+		if (cause instanceof com.fasterxml.jackson.databind.exc.InvalidFormatException invalidFormatException) {
+			return invalidFormatException.getTargetType() != null
+					&& EditionState.class.isAssignableFrom(invalidFormatException.getTargetType());
+		}
+		if (cause instanceof tools.jackson.databind.exc.InvalidFormatException invalidFormatException) {
+			return invalidFormatException.getTargetType() != null
+					&& EditionState.class.isAssignableFrom(invalidFormatException.getTargetType());
+		}
+		return false;
 	}
 
 	public record ChangeEditionStateRequest(EditionState state) {

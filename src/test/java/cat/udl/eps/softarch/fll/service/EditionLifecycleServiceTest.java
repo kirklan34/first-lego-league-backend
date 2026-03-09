@@ -158,4 +158,16 @@ class EditionLifecycleServiceTest {
 
 		assertEquals("EDITION_OPERATION_NOT_ALLOWED", ex.getError());
 	}
+
+	@Test
+	void assertOperationAllowedShouldTreatNullStateAsDraft() {
+		edition.setState(null);
+
+		EditionLifecycleException ex = assertThrows(
+				EditionLifecycleException.class,
+				() -> editionLifecycleService.assertOperationAllowed(edition, EditionOperation.TEAM_REGISTRATION));
+
+		assertEquals("EDITION_OPERATION_NOT_ALLOWED", ex.getError());
+		assertEquals("Operation TEAM_REGISTRATION is not allowed when edition is in state DRAFT", ex.getMessage());
+	}
 }
