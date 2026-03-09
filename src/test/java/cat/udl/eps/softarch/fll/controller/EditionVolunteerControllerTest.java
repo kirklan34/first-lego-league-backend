@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import cat.udl.eps.softarch.fll.controller.dto.EditionVolunteersResponse;
 import cat.udl.eps.softarch.fll.controller.dto.VolunteerSummaryResponse;
 import cat.udl.eps.softarch.fll.exception.EditionVolunteerException;
+import cat.udl.eps.softarch.fll.handler.EditionVolunteerExceptionHandler;
 import cat.udl.eps.softarch.fll.service.EditionVolunteerService;
 
 class EditionVolunteerControllerTest {
@@ -24,7 +25,9 @@ class EditionVolunteerControllerTest {
 	void setUp() {
 		editionVolunteerService = mock(EditionVolunteerService.class);
 		EditionVolunteerController controller = new EditionVolunteerController(editionVolunteerService);
-		mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+		mockMvc = MockMvcBuilders.standaloneSetup(controller)
+				.setControllerAdvice(new EditionVolunteerExceptionHandler())
+				.build();
 	}
 
 	@Test

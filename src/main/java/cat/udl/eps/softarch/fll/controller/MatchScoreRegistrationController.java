@@ -30,7 +30,7 @@ public class MatchScoreRegistrationController {
 	public RegisterMatchScoreResponse registerFinalScore(@RequestBody RegisterMatchScoreRequest request) {
 		if (request == null || request.score() == null) {
 			throw new MatchScoreRegistrationService.RegistrationException(
-					MatchScoreRegistrationService.ErrorCode.INVALID_SCORE,
+					MatchScoreRegistrationService.ErrorCode.INVALID_SCORE_PAYLOAD,
 					"Invalid score payload");
 		}
 
