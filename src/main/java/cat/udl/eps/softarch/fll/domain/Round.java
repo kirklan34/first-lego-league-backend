@@ -75,7 +75,6 @@ public class Round extends UriEntity<Long> {
 	public void removeMatch(Match match) {
 		if (match == null) {
 			return;
-
 		}
 
 		if (this.matches.removeIf(m -> m == match)) {
