@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import cat.udl.eps.softarch.fll.domain.CompetitionTable;
 import cat.udl.eps.softarch.fll.domain.Match;
 import cat.udl.eps.softarch.fll.domain.Referee;
+import cat.udl.eps.softarch.fll.domain.Team;
 import jakarta.persistence.LockModeType;
 
 @Repository
@@ -24,7 +25,7 @@ public interface MatchRepository extends
 	PagingAndSortingRepository<Match, Long>,
 	JpaSpecificationExecutor<Match> {
 
-@Query("""
+	@Query("""
 			SELECT m FROM Match m
 			WHERE m.referee = :referee
 			AND m.startTime < :newMatchEndTime
@@ -32,10 +33,10 @@ public interface MatchRepository extends
 			AND m.id <> :currentMatchId
 			""")
 	List<Match> findOverlappingAssignments(
-			@Param("referee") Referee referee,
-			@Param("newMatchStartTime") LocalTime newMatchStartTime,
-			@Param("newMatchEndTime") LocalTime newMatchEndTime,
-			@Param("currentMatchId") Long currentMatchId);
+		@Param("referee") Referee referee,
+		@Param("newMatchStartTime") LocalTime newMatchStartTime,
+		@Param("newMatchEndTime") LocalTime newMatchEndTime,
+		@Param("currentMatchId") Long currentMatchId);
 
 	@Query("""
 			SELECT COUNT(m) > 0 FROM Match m
@@ -46,10 +47,10 @@ public interface MatchRepository extends
 			""")
 	@RestResource(exported = false)
 	boolean existsOverlappingAssignmentsForTable(
-			@Param("table") CompetitionTable table,
-			@Param("newMatchStartTime") LocalTime newMatchStartTime,
-			@Param("newMatchEndTime") LocalTime newMatchEndTime,
-			@Param("currentMatchId") Long currentMatchId);
+		@Param("table") CompetitionTable table,
+		@Param("newMatchStartTime") LocalTime newMatchStartTime,
+		@Param("newMatchEndTime") LocalTime newMatchEndTime,
+		@Param("currentMatchId") Long currentMatchId);
 
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	@Query("SELECT m FROM Match m WHERE m.id = :id")
@@ -64,8 +65,15 @@ public interface MatchRepository extends
 			AND (:currentMatchId IS NULL OR m.id <> :currentMatchId)
 			""")
 	List<Match> findOverlappingMatchesByTable(
-			@Param("tableId") String tableId,
-			@Param("newStartTime") LocalTime newStartTime,
-			@Param("newEndTime") LocalTime newEndTime,
-			@Param("currentMatchId") Long currentMatchId);
+		@Param("tableId") String tableId,
+		@Param("newStartTime") LocalTime newStartTime,
+		@Param("newEndTime") LocalTime newEndTime,
+		@Param("currentMatchId") Long currentMatchId);
+
+	@Query("""
+			SELECT m FROM Match m
+			WHERE m.teamA = :team OR m.teamB = :team
+			""")
+	@RestResource(exported = false)
+	List<Match> findByTeam(@Param("team") Team team);
 }

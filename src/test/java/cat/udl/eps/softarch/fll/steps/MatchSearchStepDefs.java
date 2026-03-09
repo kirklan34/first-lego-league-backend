@@ -5,14 +5,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import org.springframework.http.MediaType;
 import cat.udl.eps.softarch.fll.domain.CompetitionTable;
 import cat.udl.eps.softarch.fll.domain.Match;
 import cat.udl.eps.softarch.fll.domain.Round;
+import cat.udl.eps.softarch.fll.domain.Team;
 import cat.udl.eps.softarch.fll.repository.MatchRepository;
 import cat.udl.eps.softarch.fll.repository.RoundRepository;
 import cat.udl.eps.softarch.fll.repository.CompetitionTableRepository;
+import cat.udl.eps.softarch.fll.repository.TeamRepository;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
@@ -23,22 +26,34 @@ public class MatchSearchStepDefs {
 	private MatchRepository matchRepository;
 	private RoundRepository roundRepository;
 	private CompetitionTableRepository tableRepository;
+	private TeamRepository teamRepository;
 
 	private Long currentRoundId;
 
 	public MatchSearchStepDefs(StepDefs stepDefs,
 							   MatchRepository matchRepository,
 							   RoundRepository roundRepository,
-							   CompetitionTableRepository tableRepository) {
+							   CompetitionTableRepository tableRepository,
+							   TeamRepository teamRepository) {
 		this.stepDefs = stepDefs;
 		this.matchRepository = matchRepository;
 		this.roundRepository = roundRepository;
 		this.tableRepository = tableRepository;
+		this.teamRepository = teamRepository;
 	}
 
 	@Before("@MatchSearch")
 	public void setup() {
 		matchRepository.deleteAll();
+		roundRepository.deleteAll();
+		tableRepository.deleteAll();
+		stepDefs.result = null;
+	}
+
+	@Before("@FindByTeam")
+	public void setupFindByTeam() {
+		matchRepository.deleteAll();
+		teamRepository.deleteAll();
 		roundRepository.deleteAll();
 		tableRepository.deleteAll();
 		stepDefs.result = null;
@@ -137,5 +152,69 @@ public class MatchSearchStepDefs {
 	public void theErrorCodeShouldBeInvalidTimeFilterRange() throws Exception {
 		stepDefs.result.andExpect(status().isUnprocessableEntity());
 		stepDefs.result.andExpect(jsonPath("$.errorCode").value("INVALID_TIME_FILTER_RANGE"));
+	}
+
+	@Given("a team {string} exists with matches")
+	public void aTeamExistsWithMatches(String teamName) {
+		Team team = new Team(teamName);
+		team.setCity("Barcelona");
+		team.setFoundationYear(2010);
+		team.setCategory("Challenge");
+		teamRepository.save(team);
+
+		CompetitionTable table = new CompetitionTable();
+		table.setId("Table-FindByTeam");
+		table = tableRepository.save(table);
+
+		Round round = new Round();
+		round.setNumber(99);  // ← evita colisión con number=0 del Background
+		round = roundRepository.save(round);
+		currentRoundId = round.getId();
+
+		Match match = new Match();
+		match.setStartTime(LocalTime.of(10, 0));
+		match.setEndTime(LocalTime.of(10, 30));
+		match.setTeamA(team);
+		match.setCompetitionTable(table);
+		match.setRound(round);
+		matchRepository.save(match);
+	}
+
+	@Given("a team {string} exists with no matches")
+	public void aTeamExistsWithNoMatches(String teamName) {
+		Team team = new Team(teamName);
+		team.setCity("Lleida");
+		team.setFoundationYear(2012);
+		team.setCategory("Challenge");
+		teamRepository.save(team);
+	}
+
+	@When("I search matches for team {string}")
+	public void iSearchMatchesForTeam(String teamUri) throws Exception {
+		stepDefs.result = stepDefs.mockMvc.perform(
+			get("/matches/search/findByTeam")
+				.param("team", teamUri)
+				.with(user("admin"))
+				.contentType(MediaType.APPLICATION_JSON)
+		);
+	}
+
+	@Then("the team matches response should contain matches for {string}")
+	public void theTeamMatchesResponseShouldContainMatchesFor(String teamName) throws Exception {
+		stepDefs.result
+			.andExpect(jsonPath("$._embedded.matches").isArray())
+			.andExpect(jsonPath("$._embedded.matches[0]").exists());
+	}
+
+	@Then("the team matches response should be empty")
+	public void theTeamMatchesResponseShouldBeEmpty() throws Exception {
+		stepDefs.result
+			.andExpect(jsonPath("$._embedded.matches").isArray())
+			.andExpect(jsonPath("$._embedded.matches").isEmpty());
+	}
+
+	@Then("the team matches error should be {string}")
+	public void theTeamMatchesErrorShouldBe(String errorCode) throws Exception {
+		stepDefs.result.andExpect(jsonPath("$.error").value(errorCode));
 	}
 }
