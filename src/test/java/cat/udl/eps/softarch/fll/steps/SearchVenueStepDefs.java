@@ -37,7 +37,7 @@ public class SearchVenueStepDefs {
 
     @When("I search for a venue by partial name {string}")
     public void i_search_for_a_venue_by_partial_name(String searchName) throws Exception {
-        stepDefs.result = stepDefs.mockMvc.perform(get("/venues/search/findByNameContainingIgnoreCase")
+        stepDefs.result = stepDefs.mockMvc.perform(get("/venues/search/findByNameContaining")
                 .param("name", searchName)
                 .with(user("user").roles("USER")));
     }
