@@ -14,9 +14,10 @@ import cat.udl.eps.softarch.fll.repository.MatchRepository;
 import cat.udl.eps.softarch.fll.repository.RoundRepository;
 import cat.udl.eps.softarch.fll.repository.CompetitionTableRepository;
 import cat.udl.eps.softarch.fll.repository.TeamRepository;
-
 import io.cucumber.java.Before;
-import io.cucumber.java.en.*;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 
 public class MatchSearchStepDefs {
 
@@ -29,7 +30,7 @@ public class MatchSearchStepDefs {
 	private Long currentRoundId;
 
 	public MatchSearchStepDefs(StepDefs stepDefs, MatchRepository matchRepository,
-			RoundRepository roundRepository, CompetitionTableRepository tableRepository) {
+			RoundRepository roundRepository, CompetitionTableRepository tableRepository, TeamRepository teamRepository) {
 		this.stepDefs = stepDefs;
 		this.matchRepository = matchRepository;
 		this.roundRepository = roundRepository;
