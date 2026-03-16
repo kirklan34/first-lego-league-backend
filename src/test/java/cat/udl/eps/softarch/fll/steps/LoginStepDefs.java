@@ -1,6 +1,5 @@
 package cat.udl.eps.softarch.fll.steps;
 
-import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -26,6 +25,6 @@ public class LoginStepDefs {
 
 	@And("The identity username is {string}")
 	public void theIdentityUsernameIs(String username) throws Exception {
-		stepDefs.result.andExpect(jsonPath("$.id", is(username)));
+		stepDefs.result.andExpect(jsonPath("$._links.self.href", org.hamcrest.Matchers.endsWith("/" + username)));
 	}
 }
