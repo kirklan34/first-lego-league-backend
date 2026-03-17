@@ -8,8 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.nio.charset.StandardCharsets;
-
-import cat.udl.eps.softarch.fll.steps.StepDefs;
+import cat.udl.eps.softarch.fll.steps.app.StepDefs;
 import org.json.JSONObject;
 import org.springframework.http.MediaType;
 import cat.udl.eps.softarch.fll.domain.Administrator;
